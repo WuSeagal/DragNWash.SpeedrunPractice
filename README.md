@@ -61,6 +61,17 @@ Configurable in `BepInEx/config/dragnwash.speedrunpractice.cfg` (key names are U
 | F7 | Skip level |
 | F8 | Advance dragon state |
 
+## Game version compatibility
+
+The plugin is compiled against the game's own assemblies, so a game update can break it. Match the plugin to your game build (find the build ID on [SteamDB](https://steamdb.info/app/4739660/patchnotes/), or in `steamapps/appmanifest_4739660.acf` under `buildid`).
+
+| Plugin | Game build (Steam build ID) | Notes |
+|---|---|---|
+| **v1.2.0+** | **25286774** (2026-09-14) and later | Saves via the game's own routine; expected to also work on older builds |
+| v1.0.0 – v1.1.1 | builds before 25286774 | Level jump is broken on 25286774+ (the update moved saves to a new folder/format) |
+
+If a new game update breaks something, open an issue with the build ID and the `BepInEx/LogOutput.log` lines containing `Speedrun`.
+
 ## Story flags reference
 
 The story is driven by **Yarn Spinner** dialogue scripts; every flag is a boolean variable in those scripts. Apart from `levelIndex`, the save file contains nothing but these flags, so they *are* the story progress. Toggle them live under "Show story flags" in the F1 overlay.

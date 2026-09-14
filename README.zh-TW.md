@@ -64,6 +64,17 @@
 | F7 | 跳過本關 |
 | F8 | 龍的狀態前進一格 |
 
+## 遊戲版本對應
+
+插件是對遊戲本身的組件編譯的，遊戲更新可能讓它失效。請依你的遊戲 build 選擇插件版本（build ID 可在 [SteamDB](https://steamdb.info/app/4739660/patchnotes/) 查，或看 `steamapps/appmanifest_4739660.acf` 裡的 `buildid`）。
+
+| 插件版本 | 遊戲 build（Steam build ID） | 備註 |
+|---|---|---|
+| **v1.2.0 以上** | **25286774**（2026-09-14）及之後 | 透過遊戲自己的存檔函式寫入；預期舊 build 也能用 |
+| v1.0.0 – v1.1.1 | 25286774 之前的 build | 在 25286774 以上跳關會失效（該次更新把存檔換了目錄與格式） |
+
+若遊戲更新後某功能失效，請開 issue 附上 build ID 以及 `BepInEx/LogOutput.log` 裡含 `Speedrun` 的行。
+
 ## Story flags 說明
 
 遊戲劇情用 **Yarn Spinner** 對話腳本驅動，每個旗標就是腳本裡的一個布林變數。存檔裡除了 `levelIndex` 之外只有這些旗標，所以旗標 = 劇情進度的全部。F1 選單的「Show story flags」可即時勾選。
