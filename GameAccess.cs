@@ -76,11 +76,6 @@ namespace DragNWash.SpeedrunPractice
             }
         }
 
-        /// <summary>Snapshot of the live flag registry as JSON text (same format as savegame.dgn).</summary>
-        public static string SerializeCurrentState()
-        {
-            return Flags.ToJson(CurrentLevel).ToString();
-        }
 
         /// <summary>Overwrite the active save slot with the given JSON and reload the play scene.</summary>
         public static void WriteSaveAndReload(string json)

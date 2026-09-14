@@ -7,13 +7,13 @@ A speedrun practice plugin for *Drag'n Wash* (BepInEx). English section below.
 
 - **F1** 練習選單：目前關卡 / 龍的狀態 / 清潔百分比 / 每關計時
 - **關卡選擇**：直接跳到 1–14 任一關（劇情旗標會自動設成該關應有的狀態）
-- **練習存檔槽**（5 槽）：**F5** 存、**F9** 讀，PageUp / PageDown 切換槽位。不會覆蓋你的遊戲存檔，獨立存在 `BepInEx/config/DragNWash.SpeedrunPractice/`
+- **龍的狀態單步推進**（**F8**）：`WaitingToAppear → WalkingToWindow → WaitingToBeLetIn → … → Exited`，一次前進一格
 - **F4** 從本關開頭重來
-- **F6** 一鍵洗乾淨、**F7** 跳過本關（遊戲內建但被隱藏的 debug 功能）
-- 天氣切換、慢動作（Time Scale）滑桿、劇情旗標即時勾選
-- 遊戲原本藏起來的 *Instant Clean / Skip Level / Delete Save* 按鈕會顯示在遊戲 UI 裡
+- **F6** 一鍵洗乾淨、**F7** 跳過本關（呼叫遊戲內建的 debug 功能）
+- 天氣切換、慢動作（Time Scale）滑桿
+- 劇情旗標即時勾選，附上每個旗標的說明
 
-> 限制：遊戲存檔只記錄「第幾關 + 劇情旗標」，所以存讀槽的最小粒度是**關卡開頭**，無法保存關卡中途的清洗進度。
+> 注意：跳關與重來會覆寫**目前存檔槽**的 `savegame.dgn`（遊戲重載關卡的唯一途徑）。建議用專門的存檔槽練習。
 
 ## 安裝
 
@@ -39,11 +39,10 @@ A speedrun practice plugin for *Drag'n Wash* (BepInEx). English section below.
 | 鍵 | 功能 |
 |---|---|
 | F1 | 開關練習選單 |
-| F5 / F9 | 存入 / 讀取目前練習槽 |
-| PageUp / PageDown | 切換練習槽 |
 | F4 | 本關重來 |
 | F6 | 一鍵洗乾淨 |
 | F7 | 跳過本關 |
+| F8 | 龍的狀態前進一格 |
 
 ---
 
@@ -53,12 +52,12 @@ A speedrun practice plugin for *Drag'n Wash* (BepInEx). English section below.
 
 - **F1** overlay: current level, dragon state, clean %, per-level timer
 - **Level select**: jump straight to any of the 14 levels with story flags set as a real run would have them
-- **5 practice state slots**: **F5** save / **F9** load, PageUp / PageDown to pick a slot. Stored separately in `BepInEx/config/DragNWash.SpeedrunPractice/`, your real save is untouched
+- **Dragon state stepper** (**F8**): advance `WaitingToAppear → WalkingToWindow → … → Exited` one step at a time
 - **F4** restart current level, **F6** instant clean, **F7** skip level
-- Weather switch, time-scale slider, live story-flag toggles
-- Re-enables the game's hidden *Instant Clean / Skip Level / Delete Save* debug buttons
+- Weather switch, time-scale slider
+- Live story-flag toggles with a short description of each flag
 
-> Limitation: the game only saves *level index + story flags*, so state slots restore the **start of a level**, not mid-level washing progress.
+> Note: level jump / reload overwrite the **current save slot's** `savegame.dgn` (it is the only way the game reloads a level). Use a dedicated slot for practice.
 
 ### Install
 

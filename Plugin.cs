@@ -1,9 +1,7 @@
 using System;
-using System.IO;
 using BepInEx;
 using BepInEx.Configuration;
 using BepInEx.Logging;
-using HarmonyLib;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -14,51 +12,37 @@ namespace DragNWash.SpeedrunPractice
     {
         public const string Guid = "dragnwash.speedrunpractice";
         public const string Name = "DragNWash Speedrun Practice";
-        public const string Version = "1.0.0";
-
-        private const int StateSlotCount = 5;
+        public const string Version = "1.1.0";
 
         internal static ManualLogSource Log;
 
         private ConfigEntry<Key> _menuKey;
-        private ConfigEntry<Key> _saveStateKey;
-        private ConfigEntry<Key> _loadStateKey;
         private ConfigEntry<Key> _reloadKey;
         private ConfigEntry<Key> _instantCleanKey;
         private ConfigEntry<Key> _skipLevelKey;
-        private ConfigEntry<Key> _prevSlotKey;
-        private ConfigEntry<Key> _nextSlotKey;
+        private ConfigEntry<Key> _nextDragonStateKey;
 
         private bool _menuVisible;
-        private int _activeSlot = 1;
         private int _jumpTarget = 1;
         private float _timeScale = 1f;
         private string _status = "";
         private float _statusUntil;
-        private Rect _windowRect = new Rect(20, 20, 420, 560);
+        private Rect _windowRect = new Rect(20, 20, 460, 560);
         private Vector2 _flagScroll;
         private bool _showFlags;
         private TicketLock.Ticket _cursorTicket;
 
         private readonly LevelTimer _timer = new LevelTimer();
 
-        private string StateDir => Path.Combine(Paths.ConfigPath, "DragNWash.SpeedrunPractice");
-
         private void Awake()
         {
             Log = Logger;
 
             _menuKey = Config.Bind("Hotkeys", "ToggleMenu", Key.F1, "Show/hide the practice overlay");
-            _saveStateKey = Config.Bind("Hotkeys", "SaveState", Key.F5, "Save current level+flags into the active slot");
-            _loadStateKey = Config.Bind("Hotkeys", "LoadState", Key.F9, "Load the active slot and reload the level");
             _reloadKey = Config.Bind("Hotkeys", "ReloadLevel", Key.F4, "Restart the current level from its beginning");
             _instantCleanKey = Config.Bind("Hotkeys", "InstantClean", Key.F6, "Instantly clean the active dragon");
             _skipLevelKey = Config.Bind("Hotkeys", "SkipLevel", Key.F7, "Skip the current level");
-            _prevSlotKey = Config.Bind("Hotkeys", "PrevSlot", Key.PageDown, "Select previous state slot");
-            _nextSlotKey = Config.Bind("Hotkeys", "NextSlot", Key.PageUp, "Select next state slot");
-
-            Directory.CreateDirectory(StateDir);
-            Harmony.CreateAndPatchAll(typeof(Patches), Guid);
+            _nextDragonStateKey = Config.Bind("Hotkeys", "NextDragonState", Key.F8, "Advance the dragon to its next state");
 
             Log.LogInfo($"{Name} {Version} loaded. Press {_menuKey.Value} for the practice menu.");
         }
@@ -75,13 +59,10 @@ namespace DragNWash.SpeedrunPractice
             if (kb == null) return;
 
             if (kb[_menuKey.Value].wasPressedThisFrame) ToggleMenu();
-            if (kb[_saveStateKey.Value].wasPressedThisFrame) SaveState(_activeSlot);
-            if (kb[_loadStateKey.Value].wasPressedThisFrame) LoadState(_activeSlot);
             if (kb[_reloadKey.Value].wasPressedThisFrame) ReloadLevel();
             if (kb[_instantCleanKey.Value].wasPressedThisFrame) InstantClean();
             if (kb[_skipLevelKey.Value].wasPressedThisFrame) SkipLevel();
-            if (kb[_prevSlotKey.Value].wasPressedThisFrame) SelectSlot(_activeSlot - 1);
-            if (kb[_nextSlotKey.Value].wasPressedThisFrame) SelectSlot(_activeSlot + 1);
+            if (kb[_nextDragonStateKey.Value].wasPressedThisFrame) NextDragonState();
 
             // The game nulls the dragonStateChanged delegate on every scene load
             // (see WalkNWashSceneState.Init), so re-subscribe whenever we are dropped.
@@ -113,47 +94,6 @@ namespace DragNWash.SpeedrunPractice
             if (_cursorTicket == null) return;
             GameStateManager.ReleaseCursorUnlock(ref _cursorTicket);
             _cursorTicket = null;
-        }
-
-        private void SelectSlot(int slot)
-        {
-            _activeSlot = Mathf.Clamp(slot, 1, StateSlotCount);
-            SetStatus($"Slot {_activeSlot} selected");
-        }
-
-        private string SlotPath(int slot) => Path.Combine(StateDir, $"state_{slot}.json");
-
-        private void SaveState(int slot)
-        {
-            if (!GameAccess.InPlayScene) { SetStatus("Not in a level"); return; }
-            try
-            {
-                File.WriteAllText(SlotPath(slot), GameAccess.SerializeCurrentState());
-                SetStatus($"Saved slot {slot} (level {GameAccess.CurrentLevel + 1})");
-            }
-            catch (Exception e)
-            {
-                Log.LogError(e);
-                SetStatus("Save failed, see log");
-            }
-        }
-
-        private void LoadState(int slot)
-        {
-            if (!GameAccess.InPlayScene) { SetStatus("Not in a level"); return; }
-            string path = SlotPath(slot);
-            if (!File.Exists(path)) { SetStatus($"Slot {slot} is empty"); return; }
-            try
-            {
-                GameAccess.WriteSaveAndReload(File.ReadAllText(path));
-                SetStatus($"Loading slot {slot}...");
-                CloseMenu();
-            }
-            catch (Exception e)
-            {
-                Log.LogError(e);
-                SetStatus("Load failed, see log");
-            }
         }
 
         private void ReloadLevel()
@@ -190,6 +130,20 @@ namespace DragNWash.SpeedrunPractice
             SetStatus("Skipping level...");
         }
 
+        /// <summary>
+        /// The game only accepts transitions to the immediately following state
+        /// (see WalkNWashSceneState.SetDragonState), so we can only step forward.
+        /// </summary>
+        private void NextDragonState()
+        {
+            if (!GameAccess.InPlayScene) return;
+            var current = WalkNWashSceneState.GetDragonState();
+            if (current == WalkNWashSceneState.DragonState.Exited) { SetStatus("Dragon already exited"); return; }
+            var next = (WalkNWashSceneState.DragonState)((int)current + 1);
+            WalkNWashSceneState.SetDragonState(next);
+            SetStatus($"Dragon state: {current} -> {next}");
+        }
+
         private void CloseMenu()
         {
             _menuVisible = false;
@@ -220,26 +174,13 @@ namespace DragNWash.SpeedrunPractice
                 : "Not in a level (load a save first)");
             if (inLevel)
             {
-                GUILayout.Label($"State: {WalkNWashSceneState.GetDragonState()}   Clean: {WalkNWashSceneState.GetCleanPercentage():P0}");
-                GUILayout.Label($"Level time: {_timer.CurrentText}   Last: {_timer.LastText}");
+                GUILayout.Label($"Clean: {WalkNWashSceneState.GetCleanPercentage():P0}   Level time: {_timer.CurrentText}   Last: {_timer.LastText}");
+                GUILayout.BeginHorizontal();
+                GUILayout.Label($"Dragon state: {WalkNWashSceneState.GetDragonState()}");
+                GUILayout.FlexibleSpace();
+                if (GUILayout.Button($"Next state > [{_nextDragonStateKey.Value}]")) NextDragonState();
+                GUILayout.EndHorizontal();
             }
-
-            GUILayout.Space(8);
-            GUILayout.Label("Practice state slots");
-            GUILayout.BeginHorizontal();
-            for (int i = 1; i <= StateSlotCount; i++)
-            {
-                bool exists = File.Exists(SlotPath(i));
-                string label = (i == _activeSlot ? "> " : "") + i + (exists ? "*" : "");
-                if (GUILayout.Toggle(i == _activeSlot, label, GUI.skin.button)) _activeSlot = i;
-            }
-            GUILayout.EndHorizontal();
-            GUILayout.BeginHorizontal();
-            GUI.enabled = inLevel;
-            if (GUILayout.Button($"Save [{_saveStateKey.Value}]")) SaveState(_activeSlot);
-            if (GUILayout.Button($"Load [{_loadStateKey.Value}]")) LoadState(_activeSlot);
-            GUI.enabled = true;
-            GUILayout.EndHorizontal();
 
             GUILayout.Space(8);
             GUILayout.Label("Level select");
@@ -287,10 +228,13 @@ namespace DragNWash.SpeedrunPractice
             _showFlags = GUILayout.Toggle(_showFlags, "Show story flags");
             if (_showFlags && inLevel)
             {
-                _flagScroll = GUILayout.BeginScrollView(_flagScroll, GUILayout.Height(140));
+                _flagScroll = GUILayout.BeginScrollView(_flagScroll, GUILayout.Height(200));
                 foreach (var kv in GameAccess.GetBoolFlags())
                 {
-                    bool v = GUILayout.Toggle(kv.Value, kv.Key);
+                    if (FlagInfo.IsInternal(kv.Key)) continue;
+                    string note = FlagInfo.Describe(kv.Key);
+                    string label = string.IsNullOrEmpty(note) ? kv.Key : $"{kv.Key}  -  {note}";
+                    bool v = GUILayout.Toggle(kv.Value, label);
                     if (v != kv.Value) WalkNWashSceneState.SetFlag(kv.Key, v);
                 }
                 GUILayout.EndScrollView();
