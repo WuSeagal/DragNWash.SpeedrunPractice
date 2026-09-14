@@ -1,5 +1,4 @@
 using System;
-using System.Collections;
 using BepInEx;
 using BepInEx.Configuration;
 using BepInEx.Logging;
@@ -13,7 +12,7 @@ namespace DragNWash.SpeedrunPractice
     {
         public const string Guid = "dragnwash.speedrunpractice";
         public const string Name = "DragNWash Speedrun Practice";
-        public const string Version = "1.4.0";
+        public const string Version = "1.4.1";
 
         internal static ManualLogSource Log;
 
@@ -168,58 +167,6 @@ namespace DragNWash.SpeedrunPractice
             }
         }
 
-        /// <summary>
-        /// Jump to the level whose outro queues this cutscene, with the romance flag set,
-        /// then auto-advance the dragon and clean it so the player lands at the outro.
-        /// Finishing the outro and hitting the exit triggers the cutscene naturally.
-        /// </summary>
-        private void SetupCutsceneLevel(CutsceneSetup cutscene)
-        {
-            if (!GameAccess.InPlayScene) { SetStatus("Not in a level"); return; }
-            if (cutscene.Level > GameAccess.LevelCount) { SetStatus($"Level {cutscene.Level} does not exist in this game build"); return; }
-            int target = cutscene.Level - 1;
-            var flags = GameAccess.GetBoolFlags();
-            LevelJump.ApplyFlagsForLevel(target, GameAccess.LevelFlow, flags);
-            cutscene.Apply(flags);
-            GameAccess.SaveLevelAndFlags(target, flags);
-            var previous = GameAccess.SceneState;
-            GameAccess.ReloadPlayScene();
-            if (_autoFinish != null) StopCoroutine(_autoFinish);
-            _autoFinish = StartCoroutine(AutoFinishLevel(previous));
-            SetStatus($"Setting up level {cutscene.Level} for the {cutscene.Label} cutscene...");
-            CloseMenu();
-        }
-
-        private Coroutine _autoFinish;
-
-        private IEnumerator AutoFinishLevel(WalkNWashSceneState previousInstance)
-        {
-            float deadline = Time.realtimeSinceStartup + 60f;
-            // Wait for the reloaded scene: a new WalkNWashSceneState with a spawned dragon.
-            while (Time.realtimeSinceStartup < deadline)
-            {
-                var state = GameAccess.SceneState;
-                if (state != null && state != previousInstance && WalkNWashSceneState.TryGetActiveDragon(out _)
-                    && WalkNWashSceneState.GetDragonState() >= WalkNWashSceneState.DragonState.WalkingToWindow)
-                {
-                    break;
-                }
-                yield return null;
-            }
-            if (Time.realtimeSinceStartup >= deadline) { SetStatus("Auto-finish timed out"); _autoFinish = null; yield break; }
-
-            yield return new WaitForSecondsRealtime(1f);
-            while (WalkNWashSceneState.GetDragonState() < WalkNWashSceneState.DragonState.WaitingOnBeingWashed)
-            {
-                NextDragonState();
-                yield return new WaitForSecondsRealtime(0.3f);
-            }
-            yield return new WaitForSecondsRealtime(0.5f);
-            InstantClean();
-            SetStatus("Level finished: play the outro, then use the exit to trigger the cutscene");
-            _autoFinish = null;
-        }
-
         private void CloseMenu()
         {
             _menuVisible = false;
@@ -293,20 +240,13 @@ namespace DragNWash.SpeedrunPractice
             GUILayout.Label("Cutscenes");
             GUI.enabled = inLevel;
             GUILayout.BeginHorizontal();
-            GUILayout.Label("Level end:", GUILayout.Width(70));
-            foreach (var c in CutsceneSetup.All)
-            {
-                if (GUILayout.Button($"{c.Label} (L{c.Level})")) SetupCutsceneLevel(c);
-            }
-            GUILayout.EndHorizontal();
-            GUILayout.BeginHorizontal();
             GUILayout.Label("Play now:", GUILayout.Width(70));
             foreach (var c in CutsceneSetup.All)
             {
                 if (GUILayout.Button(c.Label)) PlayCutscene(c.Intent, c.Label);
             }
             GUILayout.EndHorizontal();
-            GUILayout.Label("Level end = jump to that level with the romance flag set, auto-clean, then finish the outro and exit. Alexander's cutscene leads to the credits.");
+            GUILayout.Label("Alexander's cutscene leads to the credits.");
             GUI.enabled = true;
 
             GUILayout.BeginHorizontal();

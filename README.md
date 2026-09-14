@@ -20,9 +20,7 @@ A speedrun practice plugin for *Drag'n Wash* (BepInEx).
 - **Level select**: jump straight to any of the 14 levels with story flags set as a real run would have them
 - **Dragon state stepper** (**F8**): advance `WaitingToAppear → WalkingToWindow → … → Exited` one step at a time
 - **F4** restart current level, **F6** instant clean, **F7** skip level
-- **Cutscenes**
-  - *Level end*: jump to the level whose outro queues that cutscene, with the right romance flag set; the plugin auto-advances the dragon and cleans it so you land at the outro. Finish the outro and hit the exit and the cutscene triggers exactly as in a real run
-  - *Play now*: load the cutscene scene directly. When it ends the game marks it watched, saves, and returns to the level (Alexander's leads to the credits)
+- **Cutscenes**: load any of the four cutscenes directly (Ryan+Conrad / Ryan / Conrad / Alexander). When it ends the game marks it watched, saves, and returns to the level (Alexander's leads to the credits). To reach one the natural way instead, jump to its level (see table below), tick the matching `*_romanced` flag, finish the level and exit
 - Weather switch, time-scale slider
 - Live story-flag toggles with a short description of each flag
 
@@ -70,7 +68,7 @@ The plugin is compiled against the game's own assemblies, so a game update can b
 
 | Plugin | Game build (Steam build ID) | Notes |
 |---|---|---|
-| **v1.2.0 – v1.4.0** | **25286774** (2026-09-14) and later | Saves via the game's own routine; expected to also work on older builds |
+| **v1.2.0 – v1.4.1** | **25286774** (2026-09-14) and later | Saves via the game's own routine; expected to also work on older builds |
 | v1.0.0 – v1.1.1 | builds before 25286774 | Level jump is broken on 25286774+ (the update moved saves to a new folder/format) |
 
 If a new game update breaks something, open an issue with the build ID and the `BepInEx/LogOutput.log` lines containing `Speedrun`.

@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-
 namespace DragNWash.SpeedrunPractice
 {
     /// <summary>
@@ -25,19 +23,5 @@ namespace DragNWash.SpeedrunPractice
             new CutsceneSetup { Label = "Alexander",   Intent = "AlexanderSexScene",  Level = 15, RomanceFlag = "alexander_romanced",   SceneFlag = "alexander_sex_scene",   WatchedFlag = "finished_watching_alexander_sex_scene" },
         };
 
-        /// <summary>
-        /// Flag state for "start of the cutscene's level, romance route taken, cutscene
-        /// not yet queued or watched". SceneFlag must stay false here: WalkNWashSceneState.Start()
-        /// would otherwise jump straight to the cutscene instead of loading the level.
-        /// </summary>
-        public void Apply(Dictionary<string, bool> flags)
-        {
-            // Outros test the romance flags in a fixed order and take the first match,
-            // so only the target route may be active.
-            foreach (var other in All) flags[other.RomanceFlag] = false;
-            flags[RomanceFlag] = true;
-            flags[SceneFlag] = false;
-            flags[WatchedFlag] = false;
-        }
     }
 }
