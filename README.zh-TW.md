@@ -18,22 +18,31 @@
 
 ## 安裝
 
-1. **安裝 BepInEx 5**（若已裝過可跳過）
-   - 下載 [BepInEx 5.4.x **x64**](https://github.com/BepInEx/BepInEx/releases)（檔名類似 `BepInEx_win_x64_5.4.23.x.zip`）
-   - 解壓到遊戲資料夾（含 `DragNWash.exe` 的那層；Steam：右鍵遊戲 → 管理 → 瀏覽本機檔案）
-   - 啟動一次遊戲再關閉，讓 BepInEx 產生 `BepInEx/plugins` 等資料夾
-2. 從 [Releases](../../releases) 下載 `DragNWash.SpeedrunPractice-vX.Y.Z.zip`
-3. 解壓到遊戲資料夾，讓路徑成為  
-   `Drag'n Wash/BepInEx/plugins/DragNWash.SpeedrunPractice/DragNWash.SpeedrunPractice.dll`
-4. 啟動遊戲，載入存檔後按 **F1**
+先打開遊戲資料夾：Steam 收藏庫對 *Drag'n Wash* 按右鍵 → **管理** → **瀏覽本機檔案**，裡面有 `DragNWash.exe`。
+
+### A. 我沒裝過 BepInEx（大多數玩家）
+
+1. 從 [Releases](../../releases/latest) 下載 **`DragNWash.SpeedrunPractice-vX.Y.Z-full.zip`**
+2. 打開 zip，把裡面**全部內容**拖進遊戲資料夾（和 `DragNWash.exe` 同一層），詢問是否覆蓋就選是
+3. 啟動遊戲，載入存檔後按 **F1**
+
+拖完後遊戲資料夾應該會多出 `winhttp.dll`、`doorstop_config.ini` 和一個 `BepInEx` 資料夾。第一次啟動會多花幾秒讓 BepInEx 初始化。
+
+### B. 我已經有 BepInEx 5
+
+1. 從 [Releases](../../releases/latest) 下載 **`DragNWash.SpeedrunPractice-vX.Y.Z-plugin-only.zip`**
+2. 打開 zip，把裡面的 `BepInEx` 資料夾拖進遊戲資料夾（會和原本的合併）
+3. 啟動遊戲，載入存檔後按 **F1**
+
+兩種方式最後都會得到 `BepInEx/plugins/DragNWash.SpeedrunPractice/DragNWash.SpeedrunPractice.dll`。
+
+### 移除
+
+刪除 `BepInEx/plugins/DragNWash.SpeedrunPractice/` 即可。若要連 BepInEx 一起移除，再刪 `winhttp.dll`、`doorstop_config.ini`、`.doorstop_version`、`changelog.txt` 和 `BepInEx` 資料夾。
 
 ### 改鍵
 
 第一次啟動後會產生 `BepInEx/config/dragnwash.speedrunpractice.cfg`，用文字編輯器改 `[Hotkeys]` 區段即可（鍵名為 Unity Input System 的 `Key` 列舉，例如 `F1`、`Backquote`、`Numpad0`）。
-
-### 移除
-
-刪除 `BepInEx/plugins/DragNWash.SpeedrunPractice/` 資料夾即可。
 
 ## 快捷鍵一覽
 
@@ -92,8 +101,11 @@
 
 ```powershell
 .\pack.ps1 -GameDir "D:\SteamLibrary\steamapps\common\Drag'n Wash"
-# → dist\DragNWash.SpeedrunPractice-vX.Y.Z.zip
+# → dist\DragNWash.SpeedrunPractice-vX.Y.Z-full.zip        (BepInEx 5 + 插件)
+# → dist\DragNWash.SpeedrunPractice-vX.Y.Z-plugin-only.zip (只有插件)
 ```
+
+full 版內含 [BepInEx](https://github.com/BepInEx/BepInEx)（LGPL-2.1，授權文附在 `BepInEx/LICENSE.BepInEx.txt`）。
 
 ## 授權
 

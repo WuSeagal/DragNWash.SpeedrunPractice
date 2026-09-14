@@ -17,14 +17,31 @@ A speedrun practice plugin for *Drag'n Wash* (BepInEx).
 
 ## Install
 
-1. Install [BepInEx 5.4.x x64](https://github.com/BepInEx/BepInEx/releases) into the game folder (next to `DragNWash.exe`), run the game once, quit.
-2. Download `DragNWash.SpeedrunPractice-vX.Y.Z.zip` from [Releases](../../releases).
-3. Extract into the game folder so you get `BepInEx/plugins/DragNWash.SpeedrunPractice/DragNWash.SpeedrunPractice.dll`.
-4. Launch, load a save, press **F1**.
+Open the game folder first: in Steam, right-click *Drag'n Wash* → **Manage** → **Browse local files**. That folder contains `DragNWash.exe`.
 
-Hotkeys are configurable in `BepInEx/config/dragnwash.speedrunpractice.cfg` (key names are Unity Input System `Key` enum values, e.g. `F1`, `Backquote`, `Numpad0`). To uninstall, delete the plugin folder.
+### A. I don't have BepInEx (most players)
 
-## Hotkeys
+1. Download **`DragNWash.SpeedrunPractice-vX.Y.Z-full.zip`** from [Releases](../../releases/latest).
+2. Open the zip and drag **everything** inside it into the game folder (next to `DragNWash.exe`). If asked, allow overwriting.
+3. Launch the game, load a save, press **F1**.
+
+After step 2 the folder should contain `winhttp.dll`, `doorstop_config.ini` and a `BepInEx` folder. The first launch takes a few seconds longer while BepInEx sets itself up.
+
+### B. I already have BepInEx 5
+
+1. Download **`DragNWash.SpeedrunPractice-vX.Y.Z-plugin-only.zip`** from [Releases](../../releases/latest).
+2. Open the zip and drag its `BepInEx` folder into the game folder (merges with the existing one).
+3. Launch the game, load a save, press **F1**.
+
+Either way you end up with `BepInEx/plugins/DragNWash.SpeedrunPractice/DragNWash.SpeedrunPractice.dll`.
+
+### Uninstall
+
+Delete `BepInEx/plugins/DragNWash.SpeedrunPractice/`. To remove BepInEx entirely, also delete `winhttp.dll`, `doorstop_config.ini`, `.doorstop_version`, `changelog.txt` and the `BepInEx` folder.
+
+### Hotkeys
+
+Configurable in `BepInEx/config/dragnwash.speedrunpractice.cfg` (key names are Unity Input System `Key` enum values, e.g. `F1`, `Backquote`, `Numpad0`).
 
 | Key | Action |
 |---|---|
@@ -85,8 +102,11 @@ Requires the .NET SDK (7+) and an installed copy of the game (the project refere
 
 ```powershell
 .\pack.ps1 -GameDir "D:\SteamLibrary\steamapps\common\Drag'n Wash"
-# → dist\DragNWash.SpeedrunPractice-vX.Y.Z.zip
+# → dist\DragNWash.SpeedrunPractice-vX.Y.Z-full.zip        (BepInEx 5 + plugin)
+# → dist\DragNWash.SpeedrunPractice-vX.Y.Z-plugin-only.zip (plugin only)
 ```
+
+The full zip bundles [BepInEx](https://github.com/BepInEx/BepInEx) (LGPL-2.1, license included as `BepInEx/LICENSE.BepInEx.txt`).
 
 ## License
 
