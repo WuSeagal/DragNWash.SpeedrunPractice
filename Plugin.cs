@@ -57,6 +57,8 @@ namespace DragNWash.SpeedrunPractice
         // set SRP_AUTOCONTINUE=1 and the plugin presses "Continue" on the main menu.
         private bool _autoContinued;
         private bool _autoJumped;
+        private bool _autoMenuDone;
+        private float _autoReloadAt;
 
         private void Update()
         {
@@ -79,6 +81,26 @@ namespace DragNWash.SpeedrunPractice
                 _autoJumped = true;
                 Log.LogInfo($"SRP_AUTOJUMP: jumping to level {autoJump}");
                 JumpToLevel(autoJump);
+            }
+
+            // Dev hooks: SRP_AUTOMENU=gui|cursor|both opens the overlay (or just its
+            // parts) once in a level; SRP_AUTORELOAD=<seconds> then reloads the level.
+            if (!_autoMenuDone && GameAccess.InPlayScene && WalkNWashSceneState.TryGetActiveDragon(out _))
+            {
+                _autoMenuDone = true;
+                string mode = Environment.GetEnvironmentVariable("SRP_AUTOMENU");
+                if (mode == "gui" || mode == "both") _menuVisible = true;
+                if (mode == "cursor" || mode == "both") AcquireCursor();
+                if (float.TryParse(Environment.GetEnvironmentVariable("SRP_AUTORELOAD"), out float delay))
+                {
+                    _autoReloadAt = Time.realtimeSinceStartup + delay;
+                    Log.LogInfo($"SRP_AUTOMENU={mode}, reload in {delay}s");
+                }
+            }
+            if (_autoReloadAt > 0f && Time.realtimeSinceStartup >= _autoReloadAt)
+            {
+                _autoReloadAt = 0f;
+                ReloadLevel();
             }
 
             var kb = Keyboard.current;

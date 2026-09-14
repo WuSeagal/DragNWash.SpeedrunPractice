@@ -62,6 +62,15 @@ Configurable in `BepInEx/config/dragnwash.speedrunpractice.cfg` (key names are U
 | F7 | Skip level |
 | F8 | Advance dragon state |
 
+## Troubleshooting: crash when the dragon starts walking
+
+If the game crashes right after a level (re)loads, as the dragon begins walking, with `UnityPlayer.dll` / `D3D12ScratchAllocator::DestroyScratch` in `Player.log`, that is a Unity 6 Direct3D 12 issue that scene reloads make more likely (with or without this plugin). Run the game on Direct3D 11 instead:
+
+1. Steam → right-click *Drag'n Wash* → **Properties** → **General** → **Launch Options**
+2. Enter `-force-d3d11`
+
+`Player.log` will then show `Forcing GfxDevice: Direct3D 11`. Tested: a save that crashed every time on D3D12 runs fine on D3D11.
+
 ## Game version compatibility
 
 The plugin is compiled against the game's own assemblies, so a game update can break it. Match the plugin to your game build (find the build ID on [SteamDB](https://steamdb.info/app/4739660/patchnotes/), or in `steamapps/appmanifest_4739660.acf` under `buildid`).

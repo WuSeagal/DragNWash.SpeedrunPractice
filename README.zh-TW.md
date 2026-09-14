@@ -65,6 +65,15 @@
 | F7 | 跳過本關 |
 | F8 | 龍的狀態前進一格 |
 
+## 疑難排解：龍開始走路時遊戲崩潰
+
+如果遊戲在關卡（重新）載入後、龍剛開始走的瞬間崩潰，且 `Player.log` 裡出現 `UnityPlayer.dll` / `D3D12ScratchAllocator::DestroyScratch`，這是 Unity 6 的 Direct3D 12 問題，場景重載會提高發生機率（有沒有裝插件都可能發生）。請改用 Direct3D 11 執行：
+
+1. Steam → 對 *Drag'n Wash* 按右鍵 → **內容** → **一般** → **啟動選項**
+2. 填入 `-force-d3d11`
+
+之後 `Player.log` 會顯示 `Forcing GfxDevice: Direct3D 11`。實測：在 D3D12 下每次必崩的存檔，改 D3D11 後正常。
+
 ## 遊戲版本對應
 
 插件是對遊戲本身的組件編譯的，遊戲更新可能讓它失效。請依你的遊戲 build 選擇插件版本（build ID 可在 [SteamDB](https://steamdb.info/app/4739660/patchnotes/) 查，或看 `steamapps/appmanifest_4739660.acf` 裡的 `buildid`）。
