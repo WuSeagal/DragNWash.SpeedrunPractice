@@ -12,7 +12,7 @@ namespace DragNWash.SpeedrunPractice
     {
         public const string Guid = "dragnwash.speedrunpractice";
         public const string Name = "DragNWash Speedrun Practice";
-        public const string Version = "1.2.0";
+        public const string Version = "1.3.0";
 
         internal static ManualLogSource Log;
 
@@ -145,6 +145,28 @@ namespace DragNWash.SpeedrunPractice
             SetStatus($"Dragon state: {current} -> {next}");
         }
 
+        /// <summary>
+        /// The base Menu class routes these intents to the cutscene scenes from any
+        /// active menu (see Menu.OnEvent). When a scene ends the game sets the matching
+        /// finished_watching_* flag, force-saves and returns to PlayGame (Alexander's
+        /// scene goes to the credits instead).
+        /// </summary>
+        private void PlayCutscene(string intent, string label)
+        {
+            if (!GameAccess.InPlayScene) { SetStatus("Not in a level"); return; }
+            try
+            {
+                MenuManager.TriggerEvent(new MenuEventUserIntent(intent));
+                SetStatus($"Loading cutscene: {label}...");
+                CloseMenu();
+            }
+            catch (Exception e)
+            {
+                Log.LogError(e);
+                SetStatus("Cutscene load failed, see log");
+            }
+        }
+
         private void CloseMenu()
         {
             _menuVisible = false;
@@ -211,6 +233,13 @@ namespace DragNWash.SpeedrunPractice
             {
                 if (GUILayout.Button(w.ToString())) WalkNWashSceneState.SetWeatherState(w);
             }
+            GUILayout.EndHorizontal();
+            GUILayout.BeginHorizontal();
+            GUILayout.Label("Cutscene:", GUILayout.Width(60));
+            if (GUILayout.Button("Ryan")) PlayCutscene("RyanSexScene", "Ryan");
+            if (GUILayout.Button("Conrad")) PlayCutscene("ConradSexScene", "Conrad");
+            if (GUILayout.Button("Ryan+Conrad")) PlayCutscene("ConradRyanSexScene", "Ryan + Conrad");
+            if (GUILayout.Button("Alexander (ends game)")) PlayCutscene("AlexanderSexScene", "Alexander");
             GUILayout.EndHorizontal();
             GUI.enabled = true;
 

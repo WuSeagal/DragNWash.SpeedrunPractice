@@ -20,6 +20,7 @@ A speedrun practice plugin for *Drag'n Wash* (BepInEx).
 - **Level select**: jump straight to any of the 14 levels with story flags set as a real run would have them
 - **Dragon state stepper** (**F8**): advance `WaitingToAppear → WalkingToWindow → … → Exited` one step at a time
 - **F4** restart current level, **F6** instant clean, **F7** skip level
+- **Cutscene jump**: load any of the four cutscenes directly (Ryan / Conrad / Ryan+Conrad / Alexander). When it ends the game marks it watched, saves, and returns to the level (Alexander's leads to the credits)
 - Weather switch, time-scale slider
 - Live story-flag toggles with a short description of each flag
 
@@ -67,7 +68,7 @@ The plugin is compiled against the game's own assemblies, so a game update can b
 
 | Plugin | Game build (Steam build ID) | Notes |
 |---|---|---|
-| **v1.2.0+** | **25286774** (2026-09-14) and later | Saves via the game's own routine; expected to also work on older builds |
+| **v1.2.0 – v1.3.0** | **25286774** (2026-09-14) and later | Saves via the game's own routine; expected to also work on older builds |
 | v1.0.0 – v1.1.1 | builds before 25286774 | Level jump is broken on 25286774+ (the update moved saves to a new folder/format) |
 
 If a new game update breaks something, open an issue with the build ID and the `BepInEx/LogOutput.log` lines containing `Speedrun`.
