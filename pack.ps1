@@ -16,6 +16,7 @@ if (Test-Path "$root\dist\stage") { Remove-Item -Recurse -Force "$root\dist\stag
 New-Item -ItemType Directory -Force $stage | Out-Null
 Copy-Item "$root\bin\Release\netstandard2.1\DragNWash.SpeedrunPractice.dll" $stage
 Copy-Item "$root\README.md" $stage
+Copy-Item "$root\README.zh-TW.md" $stage
 Copy-Item "$root\LICENSE" $stage
 
 $zip = "$root\dist\DragNWash.SpeedrunPractice-v$version.zip"
