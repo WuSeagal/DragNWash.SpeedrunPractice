@@ -109,7 +109,7 @@
 | `level_1`, `level_5`, `level_6_started` | 該關**開始**時設 true |
 | `level_1_complete`, `level_5_complete` | 該關**完成**時設 true |
 
-跳關功能會依目標關卡自動把前面的設 true、後面的設 false。
+跳關會把整組旗標從空白重建：前面關卡的里程碑、第 9 關起的坐騎流程、第 11 關起的野餐。這是盡力而為的推估——若某關看起來缺了什麼，在旗標清單勾上即可。
 
 ### 2. 當前這隻龍的互動狀態（每關重置）
 | 旗標 | 意思 |
@@ -136,9 +136,17 @@
 | `*_sex_scene` | 過場動畫**已排入佇列** |
 | `finished_watching_*_sex_scene` | 該過場**已看過** |
 
-最後兩個最重要：每次載入關卡時，若 `X_sex_scene` 為 true 但 `finished_watching_X` 為 false，遊戲會**先播過場**而不是開始關卡。跳關功能會自動把已觸發的過場標成已看過；若想練習過場後的段落，取消勾選 `finished_watching_*` 再 Reload 即可從過場開始。
+最後兩個最重要：每次載入關卡時，若 `X_sex_scene` 為 true 但 `finished_watching_X` 為 false，遊戲會**先播過場**而不是開始關卡。跳關會把所有感情線與過場旗標留在關閉；若想練習過場後的段落，勾上 `X_sex_scene`、取消 `finished_watching_X` 再 Reload 即可從過場開始。
 
 `Yarn.Internal.Once.line:xxxx` 是 Yarn 的「這句台詞只講一次」標記，對進度無影響，工具內不顯示。
+
+## 公平性
+
+這是**練習**工具：會改寫存檔、略過遊戲邏輯，請勿在準備投稿的正式 run 中使用——移除或停用插件（刪除 `BepInEx/plugins/DragNWash.SpeedrunPractice/`），並確認你所屬社群對修改遊戲檔案的規定。
+
+## 開發者備註
+
+用於自動重現問題的環境變數（未設定時完全無作用）：`SRP_AUTOCONTINUE=1` 在主選單自動按 Continue、`SRP_AUTOJUMP=<關卡>` 進關後自動跳關、`SRP_AUTOMENU=gui|cursor|both` 自動開啟選單、`SRP_AUTORELOAD=<秒>` 延遲後重載。
 
 ## 從原始碼建置
 

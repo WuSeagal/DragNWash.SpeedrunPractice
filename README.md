@@ -107,7 +107,7 @@ The story is driven by **Yarn Spinner** dialogue scripts; every flag is a boolea
 | `level_1`, `level_5`, `level_6_started` | Set true when that level **starts** |
 | `level_1_complete`, `level_5_complete` | Set true when that level is **finished** |
 
-Level jump sets earlier levels' flags true and later ones false for you.
+Level jump rebuilds the whole flag set from scratch: milestones of earlier levels, the mount chain from level 9, the picnic from level 11. It is best-effort — if a level seems to expect something that is missing, tick it in the flag list.
 
 **2. Current dragon interaction** (reset every level)
 
@@ -137,9 +137,17 @@ The level evaluator reads these to decide when the level counts as DONE.
 | `*_sex_scene` | Cutscene **queued** |
 | `finished_watching_*_sex_scene` | Cutscene **already watched** |
 
-The last two matter most: on every level load, if `X_sex_scene` is true but `finished_watching_X` is false, the game **plays the cutscene first** instead of starting the level. Level jump marks triggered cutscenes as watched automatically; to practice the section right after a cutscene, untick `finished_watching_*` and Reload.
+The last two matter most: on every level load, if `X_sex_scene` is true but `finished_watching_X` is false, the game **plays the cutscene first** instead of starting the level. Level jump leaves all romance and cutscene flags off; to practice the section right after a cutscene, tick `X_sex_scene`, untick `finished_watching_X` and Reload.
 
 `Yarn.Internal.Once.line:xxxx` flags are Yarn's "say this line once" markers. They don't affect progress and are hidden in the overlay.
+
+## Fair play
+
+This is a **practice** tool. It rewrites saves and skips game logic, so don't use it during runs you intend to submit — remove or disable the plugin (delete `BepInEx/plugins/DragNWash.SpeedrunPractice/`) and check your community's rules on modified game files.
+
+## Developer notes
+
+Environment variables for reproducing issues without clicking through menus: `SRP_AUTOCONTINUE=1` presses *Continue* on the main menu, `SRP_AUTOJUMP=<level>` jumps once a level is loaded, `SRP_AUTOMENU=gui|cursor|both` opens the overlay, `SRP_AUTORELOAD=<seconds>` reloads the level after a delay. They do nothing unless set.
 
 ## Building from source
 
