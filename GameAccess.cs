@@ -106,6 +106,7 @@ namespace DragNWash.SpeedrunPractice
         /// </summary>
         public static void SaveLevelAndFlags(int levelIndex, Dictionary<string, bool> flags)
         {
+            Flags.ClearAll();
             foreach (var kv in flags) Flags.Set(kv.Key, kv.Value);
             WalkNWashSceneState.SetLevel(levelIndex);
             WalkNWashSceneState.ForceSave();

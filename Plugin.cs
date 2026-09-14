@@ -12,7 +12,7 @@ namespace DragNWash.SpeedrunPractice
     {
         public const string Guid = "dragnwash.speedrunpractice";
         public const string Name = "DragNWash Speedrun Practice";
-        public const string Version = "1.4.1";
+        public const string Version = "1.5.0";
 
         internal static ManualLogSource Log;
 
@@ -53,8 +53,34 @@ namespace DragNWash.SpeedrunPractice
             ReleaseCursor();
         }
 
+        // Dev hook for reproducing issues without clicking through menus:
+        // set SRP_AUTOCONTINUE=1 and the plugin presses "Continue" on the main menu.
+        private bool _autoContinued;
+        private bool _autoJumped;
+
         private void Update()
         {
+            if (!_autoContinued && Environment.GetEnvironmentVariable("SRP_AUTOCONTINUE") == "1")
+            {
+                try
+                {
+                    if (MenuManager.GetCurrentMenuName() == "Menu_Main")
+                    {
+                        _autoContinued = true;
+                        Log.LogInfo("SRP_AUTOCONTINUE: triggering Continue");
+                        MenuManager.TriggerEvent(new MenuEventUserIntent("Continue"));
+                    }
+                }
+                catch (Exception) { }
+            }
+            if (!_autoJumped && GameAccess.InPlayScene && WalkNWashSceneState.TryGetActiveDragon(out _)
+                && int.TryParse(Environment.GetEnvironmentVariable("SRP_AUTOJUMP"), out int autoJump))
+            {
+                _autoJumped = true;
+                Log.LogInfo($"SRP_AUTOJUMP: jumping to level {autoJump}");
+                JumpToLevel(autoJump);
+            }
+
             var kb = Keyboard.current;
             if (kb == null) return;
 
@@ -110,9 +136,7 @@ namespace DragNWash.SpeedrunPractice
         {
             if (!GameAccess.InPlayScene) { SetStatus("Not in a level"); return; }
             int target = oneBasedLevel - 1;
-            var flags = GameAccess.GetBoolFlags();
-            LevelJump.ApplyFlagsForLevel(target, GameAccess.LevelFlow, flags);
-            GameAccess.SaveLevelAndFlags(target, flags);
+            GameAccess.SaveLevelAndFlags(target, LevelJump.BuildFlagsForLevel(target, GameAccess.LevelFlow));
             GameAccess.ReloadPlayScene();
             SetStatus($"Jumping to level {oneBasedLevel}...");
             CloseMenu();

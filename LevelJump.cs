@@ -3,52 +3,70 @@ using System.Collections.Generic;
 namespace DragNWash.SpeedrunPractice
 {
     /// <summary>
-    /// Decides what the story flags should look like when the player jumps
-    /// straight to <paramref name="targetLevel"/> from the practice menu.
+    /// Builds the story-flag set for a jump straight to a level. The set is built
+    /// from scratch: carrying flags over from the current save leaves objects from
+    /// other levels (picnic, mount...) in the scene, which corrupts the level and has
+    /// been observed to crash the renderer.
     /// </summary>
     internal static class LevelJump
     {
-        // Flags that WalkNWashSceneState.TryCheckForSexSceneNeeded() checks on scene load.
-        // Marking the "finished_watching_*" side as true keeps a level jump from
-        // replaying a cutscene the player would already have seen in a real run.
-        private static readonly string[][] CutscenePairs =
+        private struct WorldFlag
         {
-            new[] { "ryan_conrad_sex_scene", "finished_watching_conrad_ryan_sex_scene" },
-            new[] { "conrad_sex_scene", "finished_watching_conrad_sex_scene" },
-            new[] { "ryan_sex_scene", "finished_watching_ryan_sex_scene" },
-            new[] { "alexander_sex_scene", "finished_watching_alexander_sex_scene" },
-        };
+            public string Id;
+            public int AvailableFromLevel;   // 1-based level from which a real run has this flag
 
-        /// <summary>
-        /// Rebuild <paramref name="flags"/> so it matches what a real playthrough
-        /// would have after finishing every level before <paramref name="targetLevel"/>:
-        /// start/end flags of earlier levels are set, later levels' flags are cleared.
-        /// Levels are 0-based.
-        /// </summary>
-        public static void ApplyFlagsForLevel(int targetLevel, LevelFlow levelFlow, Dictionary<string, bool> flags)
-        {
-            if (levelFlow == null) return;
-
-            int count = levelFlow.GetLevelCount();
-            for (int i = 0; i < count; i++)
+            public WorldFlag(string id, int availableFromLevel)
             {
-                bool completed = i < targetLevel;
-                SetAll(flags, levelFlow.GetSetFlags(i), completed);
-                SetAll(flags, levelFlow.GetEndFlags(i), completed);
-            }
-
-            foreach (var pair in CutscenePairs)
-            {
-                if (flags.TryGetValue(pair[0], out bool triggered) && triggered) flags[pair[1]] = true;
+                Id = id;
+                AvailableFromLevel = availableFromLevel;
             }
         }
 
-        private static void SetAll(Dictionary<string, bool> flags, string[] ids, bool value)
+        // Flags set by dialogue (not by LevelFlow) that persist as world state.
+        // Levels: 8 = Conrad 3 (mount frame / mount built), 10 = Ryan 4 (picnic).
+        private static readonly WorldFlag[] WorldFlags =
+        {
+            new WorldFlag("has_talked_to_ryan", 5),
+            new WorldFlag("HasMountFrame", 9),
+            new WorldFlag("DeliveredMountFrame", 9),
+            new WorldFlag("BuiltMount", 9),
+            new WorldFlag("PlacedMount", 9),
+            new WorldFlag("PicnicPlaced", 11),
+            new WorldFlag("PicnicCompleted", 11),
+        };
+
+        /// <summary>
+        /// Flags a real playthrough would have at the start of <paramref name="targetLevel"/>
+        /// (0-based). Romance routes and cutscenes are left unset; toggle them in the
+        /// overlay's flag list if a route is needed.
+        /// </summary>
+        public static Dictionary<string, bool> BuildFlagsForLevel(int targetLevel, LevelFlow levelFlow)
+        {
+            var flags = new Dictionary<string, bool>();
+            if (levelFlow == null) return flags;
+
+            int count = levelFlow.GetLevelCount();
+            for (int i = 0; i < targetLevel && i < count; i++)
+            {
+                SetAll(flags, levelFlow.GetSetFlags(i));
+                SetAll(flags, levelFlow.GetEndFlags(i));
+                string spawnFlag = levelFlow.GetDragonSpawnFlag(i);
+                if (!string.IsNullOrEmpty(spawnFlag)) flags[spawnFlag] = true;
+            }
+
+            foreach (var world in WorldFlags)
+            {
+                if (targetLevel + 1 >= world.AvailableFromLevel) flags[world.Id] = true;
+            }
+            return flags;
+        }
+
+        private static void SetAll(Dictionary<string, bool> flags, string[] ids)
         {
             if (ids == null) return;
             foreach (string id in ids)
             {
-                if (!string.IsNullOrEmpty(id)) flags[id] = value;
+                if (!string.IsNullOrEmpty(id)) flags[id] = true;
             }
         }
     }
