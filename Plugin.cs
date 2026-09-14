@@ -12,7 +12,7 @@ namespace DragNWash.SpeedrunPractice
     {
         public const string Guid = "dragnwash.speedrunpractice";
         public const string Name = "DragNWash Speedrun Practice";
-        public const string Version = "1.1.1";
+        public const string Version = "1.2.0";
 
         internal static ManualLogSource Log;
 
@@ -112,7 +112,8 @@ namespace DragNWash.SpeedrunPractice
             int target = oneBasedLevel - 1;
             var flags = GameAccess.GetBoolFlags();
             LevelJump.ApplyFlagsForLevel(target, GameAccess.LevelFlow, flags);
-            GameAccess.WriteSaveAndReload(GameAccess.BuildSaveJson(target, flags));
+            GameAccess.SaveLevelAndFlags(target, flags);
+            GameAccess.ReloadPlayScene();
             SetStatus($"Jumping to level {oneBasedLevel}...");
             CloseMenu();
         }

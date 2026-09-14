@@ -1,8 +1,6 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
 using HarmonyLib;
-using SimpleJSON;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using WalkNWash.Flags;
@@ -77,14 +75,6 @@ namespace DragNWash.SpeedrunPractice
         }
 
 
-        /// <summary>Overwrite the active save slot with the given JSON and reload the play scene.</summary>
-        public static void WriteSaveAndReload(string json)
-        {
-            JSONNode node = JSON.Parse(json);
-            if (node == null) throw new InvalidDataException("Save JSON failed to parse.");
-            SaveManager.Save(node);
-            ReloadPlayScene();
-        }
 
         /// <summary>
         /// Route through the game's own menu system so the loading screen, fade and
@@ -109,6 +99,18 @@ namespace DragNWash.SpeedrunPractice
             return true;
         }
 
+        /// <summary>
+        /// Persist a level index + flag set using the game's own save path, so this
+        /// keeps working when the game changes its save format/location (it did in
+        /// build 25286774: SaveManager -> SaveManagerV1 with a new folder layout).
+        /// </summary>
+        public static void SaveLevelAndFlags(int levelIndex, Dictionary<string, bool> flags)
+        {
+            foreach (var kv in flags) Flags.Set(kv.Key, kv.Value);
+            WalkNWashSceneState.SetLevel(levelIndex);
+            WalkNWashSceneState.ForceSave();
+        }
+
         public static Dictionary<string, bool> GetBoolFlags()
         {
             var result = new Dictionary<string, bool>();
@@ -121,23 +123,5 @@ namespace DragNWash.SpeedrunPractice
             return result;
         }
 
-        /// <summary>Build savegame JSON from a level index and a bool flag set.</summary>
-        public static string BuildSaveJson(int levelIndex, Dictionary<string, bool> flags)
-        {
-            var array = new JSONArray();
-            var header = new JSONObject();
-            header["levelIndex"] = levelIndex;
-            array.Add(header);
-            foreach (var kv in flags)
-            {
-                var obj = new JSONObject();
-                obj["id"] = kv.Key;
-                obj["type"] = "BOOL";
-                obj["boolValue"] = kv.Value;
-                obj["stringValue"] = kv.Value;
-                array.Add(obj);
-            }
-            return array.ToString();
-        }
     }
 }
