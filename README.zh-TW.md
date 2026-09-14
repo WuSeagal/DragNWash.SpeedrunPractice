@@ -27,6 +27,12 @@
 
 > 注意：跳關與重來會覆寫**目前存檔槽**的 `savegame.dgn`（遊戲重載關卡的唯一途徑）。建議用專門的存檔槽練習。遊戲的「新遊戲」選到已有存檔的槽**不會清空它**，要重新開始請在存檔畫面用「刪除」。
 
+## 友站連結：本地化補丁
+
+**[Drag'n Wash 非官方本地化補丁](https://github.com/nekodakohaku-dev/Drag-n-Wash_Localization)** — 提供**繁體中文、簡體中文、日文**，翻譯遊戲內的對話、選項與介面文字（BepInEx + XUnity AutoTranslator）。想用中文玩這款遊戲的話，強烈推薦先裝這個。
+
+兩個專案都基於 BepInEx 5，可以同時使用。若你已經裝了本地化補丁，代表 BepInEx 已經在了，直接抓下面的 **`-plugin-only.zip`** 即可。
+
 ## 安裝
 
 先打開遊戲資料夾：Steam 收藏庫對 *Drag'n Wash* 按右鍵 → **管理** → **瀏覽本機檔案**，裡面有 `DragNWash.exe`。

@@ -26,6 +26,12 @@ A speedrun practice plugin for *Drag'n Wash* (BepInEx).
 
 > Note: level jump / reload overwrite the **current save slot's** `savegame.dgn` (it is the only way the game reloads a level). Use a dedicated slot for practice. The game's *New Game* on a slot does **not** clear it — use *Delete* on the slot screen to start clean.
 
+## See also: localization patch
+
+**[Drag'n Wash Localization](https://github.com/nekodakohaku-dev/Drag-n-Wash_Localization)** — an unofficial localization patch for the game with **Traditional Chinese, Simplified Chinese and Japanese**, covering dialogue, choices and UI text (BepInEx + XUnity AutoTranslator). Recommended if you play in one of those languages.
+
+Both projects run on BepInEx 5 and work side by side. If you already have the localization patch installed, you already have BepInEx — grab the **`-plugin-only.zip`** below.
+
 ## Install
 
 Open the game folder first: in Steam, right-click *Drag'n Wash* → **Manage** → **Browse local files**. That folder contains `DragNWash.exe`.
