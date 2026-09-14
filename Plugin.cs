@@ -12,7 +12,7 @@ namespace DragNWash.SpeedrunPractice
     {
         public const string Guid = "dragnwash.speedrunpractice";
         public const string Name = "DragNWash Speedrun Practice";
-        public const string Version = "1.1.0";
+        public const string Version = "1.1.1";
 
         internal static ManualLogSource Log;
 
@@ -27,7 +27,7 @@ namespace DragNWash.SpeedrunPractice
         private float _timeScale = 1f;
         private string _status = "";
         private float _statusUntil;
-        private Rect _windowRect = new Rect(20, 20, 460, 560);
+        private Rect _windowRect = new Rect(20, 20, 520, 640);
         private Vector2 _flagScroll;
         private bool _showFlags;
         private TicketLock.Ticket _cursorTicket;
@@ -226,22 +226,57 @@ namespace DragNWash.SpeedrunPractice
 
             GUILayout.Space(8);
             _showFlags = GUILayout.Toggle(_showFlags, "Show story flags");
-            if (_showFlags && inLevel)
-            {
-                _flagScroll = GUILayout.BeginScrollView(_flagScroll, GUILayout.Height(200));
-                foreach (var kv in GameAccess.GetBoolFlags())
-                {
-                    if (FlagInfo.IsInternal(kv.Key)) continue;
-                    string note = FlagInfo.Describe(kv.Key);
-                    string label = string.IsNullOrEmpty(note) ? kv.Key : $"{kv.Key}  -  {note}";
-                    bool v = GUILayout.Toggle(kv.Value, label);
-                    if (v != kv.Value) WalkNWashSceneState.SetFlag(kv.Key, v);
-                }
-                GUILayout.EndScrollView();
-            }
+            if (_showFlags && inLevel) DrawFlags();
 
             if (Time.unscaledTime < _statusUntil) GUILayout.Label(_status);
             GUI.DragWindow();
+        }
+
+        /// <summary>
+        /// The game's registry only holds flags that were set at least once, so a
+        /// fresh save shows a handful. Merge it with the known list so every flag is
+        /// always visible; unset ones read as false and get created when toggled.
+        /// </summary>
+        private void DrawFlags()
+        {
+            var live = GameAccess.GetBoolFlags();
+            _flagScroll = GUILayout.BeginScrollView(_flagScroll, GUILayout.Height(260));
+
+            string group = null;
+            foreach (var entry in FlagInfo.Known)
+            {
+                if (entry.Group != group)
+                {
+                    group = entry.Group;
+                    GUILayout.Space(4);
+                    GUILayout.Label($"[{group}]");
+                }
+                bool exists = live.TryGetValue(entry.Id, out bool value);
+                string suffix = exists ? "" : "   (unset)";
+                DrawFlagToggle(entry.Id, value, $"{entry.Id}  -  {entry.Description}{suffix}");
+            }
+
+            bool otherHeader = false;
+            foreach (var kv in live)
+            {
+                if (FlagInfo.IsKnown(kv.Key) || FlagInfo.IsInternal(kv.Key)) continue;
+                if (!otherHeader)
+                {
+                    otherHeader = true;
+                    GUILayout.Space(4);
+                    GUILayout.Label("[Other]");
+                }
+                string note = FlagInfo.Describe(kv.Key);
+                DrawFlagToggle(kv.Key, kv.Value, string.IsNullOrEmpty(note) ? kv.Key : $"{kv.Key}  -  {note}");
+            }
+
+            GUILayout.EndScrollView();
+        }
+
+        private static void DrawFlagToggle(string id, bool value, string label)
+        {
+            bool next = GUILayout.Toggle(value, label);
+            if (next != value) WalkNWashSceneState.SetFlag(id, next);
         }
     }
 
