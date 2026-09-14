@@ -4,6 +4,16 @@
 
 *Drag'n Wash* 的 speedrun 練習工具（BepInEx 插件）。
 
+> ### 快速安裝
+> 1. Steam → 對 *Drag'n Wash* 按右鍵 → **管理** → **瀏覽本機檔案**
+> 2. 到 **[Releases](../../releases/latest)** 下載 zip：
+>    - 沒裝過 BepInEx（大多數玩家）→ **`-full.zip`**
+>    - 已經有 BepInEx 5 → **`-plugin-only.zip`**
+> 3. 把 zip 裡的全部內容拖進剛才打開的遊戲資料夾
+> 4. 啟動遊戲，載入存檔後按 **F1**
+>
+> 詳細說明：[安裝](#安裝)
+
 ## 功能
 
 - **F1** 練習選單：目前關卡 / 龍的狀態 / 清潔百分比 / 每關計時

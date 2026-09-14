@@ -4,6 +4,16 @@
 
 A speedrun practice plugin for *Drag'n Wash* (BepInEx).
 
+> ### Quick install
+> 1. Steam → right-click *Drag'n Wash* → **Manage** → **Browse local files**
+> 2. Download a zip from **[Releases](../../releases/latest)**:
+>    - **`-full.zip`** if you don't have BepInEx (most players)
+>    - **`-plugin-only.zip`** if you already have BepInEx 5
+> 3. Drag everything inside the zip into that game folder
+> 4. Launch the game, load a save, press **F1**
+>
+> Details: [Install](#install)
+
 ## Features
 
 - **F1** overlay: current level, dragon state, clean %, per-level timer
