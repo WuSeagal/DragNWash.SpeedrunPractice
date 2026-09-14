@@ -21,7 +21,9 @@
 - **龍的狀態單步推進**（**F8**）：`WaitingToAppear → WalkingToWindow → WaitingToBeLetIn → … → Exited`，一次前進一格
 - **F4** 從本關開頭重來
 - **F6** 一鍵洗乾淨、**F7** 跳過本關（呼叫遊戲內建的 debug 功能）
-- **直接跳到過場**：四個過場動畫（Ryan / Conrad / Ryan+Conrad / Alexander）任選一個直接載入。播完後遊戲會標記已看過、存檔並回到關卡（Alexander 的會接到片尾）
+- **過場動畫**
+  - *Level end*：跳到會觸發該過場的關卡，並設好對應的感情線旗標；插件會自動把龍推進到洗澡狀態並一鍵洗乾淨，讓你直接站在關卡結尾。看完 outro 對話、按出口，過場就會和正式流程一樣自動觸發
+  - *Play now*：直接載入過場場景。播完後遊戲會標記已看過、存檔並回到關卡（Alexander 的會接到片尾）
 - 天氣切換、慢動作（Time Scale）滑桿
 - 劇情旗標即時勾選，附上每個旗標的說明
 
@@ -71,10 +73,24 @@
 
 | 插件版本 | 遊戲 build（Steam build ID） | 備註 |
 |---|---|---|
-| **v1.2.0 – v1.3.0** | **25286774**（2026-09-14）及之後 | 透過遊戲自己的存檔函式寫入；預期舊 build 也能用 |
+| **v1.2.0 – v1.4.0** | **25286774**（2026-09-14）及之後 | 透過遊戲自己的存檔函式寫入；預期舊 build 也能用 |
 | v1.0.0 – v1.1.1 | 25286774 之前的 build | 在 25286774 以上跳關會失效（該次更新把存檔換了目錄與格式） |
 
 若遊戲更新後某功能失效，請開 issue 附上 build ID 以及 `BepInEx/LogOutput.log` 裡含 `Speedrun` 的行。
+
+## 關卡順序
+
+實際有 15 關（遊戲存檔畫面寫 `/ 14`，但存檔會到 15）。粗體為會觸發過場的關卡。
+
+| # | 龍 | # | 龍 | # | 龍 |
+|---|---|---|---|---|---|
+| 1 | Ryan 1（教學） | 6 | Alexander 2 | 11 | **Conrad 4** → Ryan+Conrad 過場 |
+| 2 | Conrad 1 | 7 | Ryan 3 | 12 | Alexander 4 |
+| 3 | Alexander 1 | 8 | Conrad 3 | 13 | **Ryan 5** → Ryan 過場 |
+| 4 | Ryan 2 | 9 | Alexander 3 | 14 | **Conrad 5** → Conrad 過場 |
+| 5 | Conrad 2 | 10 | Ryan 4 | 15 | **Alexander 5** → Alexander 過場，接片尾 |
+
+過場是由該關的 outro 對話排入的，條件是對應的 `*_romanced` 旗標為 true（outro 會依固定順序檢查感情線旗標，先中的先贏），之後在下一次載入關卡時播放。
 
 ## Story flags 說明
 
